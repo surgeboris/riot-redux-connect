@@ -78,6 +78,7 @@ export default function riotReduxConnect(riot, store, globalOptions = {}) {
                         const unsubscribe = store.subscribe(updateTag);
                         this.on('before-unmount', unsubscribe);
                     }
+                    this.on('redux-sync', updateTag);
                 },
             });
         },
