@@ -40,3 +40,19 @@ export function riotTagUpdate(
         opts: Object.assign({}, this.opts, stateOpts),
     }));
 }
+
+const initStatusPropertyName = '_isRiotReduxConnectInitialized';
+export function throwIfAlreadyInitialized(obj) {
+  const isInitialized = obj[initStatusPropertyName];
+  if (isInitialized) {
+    throw new Error(
+      `attempt to call "${mixinName}" mixin method twice!`
+    );
+  }
+  Object.defineProperty(obj, initStatusPropertyName, {
+    configurable: false,
+    enumerable: false,
+    writable: false,
+    value: true,
+  });
+}

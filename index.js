@@ -3,6 +3,7 @@ import {
     memoize as memoizeDefault,
     throwIfNotObjectReturned,
     riotTagUpdate as updateWithStateToOptsAndMethodsToTagInstance,
+    throwIfAlreadyInitialized,
 } from './utils.js';
 
 import applyMdtm from './applyMapDispatchToMethods.js';
@@ -23,6 +24,8 @@ export default function riotReduxConnect(riot, store, globalOptions = {}) {
             mapDispatchToMethods = null,
             options = {},
         ) {
+            throwIfAlreadyInitialized(this);
+
             const {
                 onStateChange = defaultOnStateChange,
                 implicitDispatchOptName = defaultImplicitDispatchOptName,
