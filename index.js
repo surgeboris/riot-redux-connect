@@ -26,6 +26,8 @@ export default function riotReduxConnect(riot, store, globalOptions = {}) {
         ) {
             throwIfAlreadyInitialized(this);
 
+            const isStateMappedToOpts = typeof mapStateToOpts === 'function';
+
             const {
                 onStateChange = defaultOnStateChange,
                 implicitDispatchOptName = defaultImplicitDispatchOptName,
@@ -37,8 +39,11 @@ export default function riotReduxConnect(riot, store, globalOptions = {}) {
             const updateTag = () => {
                 const state = store.getState();
 
-                const stateOpts = mapStateToOpts(state, this);
-                throwIfNotObjectReturned('mapStateToOpts', stateOpts);
+                let stateOpts = {};
+                if (isStateMappedToOpts) {
+                    stateOpts = mapStateToOpts(state, this);
+                    throwIfNotObjectReturned('mapStateToOpts', stateOpts);
+                }
 
                 let dispatchMethods = {};
                 if (mapDispatchToMethods === null) {
@@ -69,8 +74,10 @@ export default function riotReduxConnect(riot, store, globalOptions = {}) {
             this.mixin({
                 init() {
                     updateTag();
-                    const unsubscribe = store.subscribe(updateTag);
-                    this.on('before-unmount', unsubscribe);
+                    if (isStateMappedToOpts) {
+                        const unsubscribe = store.subscribe(updateTag);
+                        this.on('before-unmount', unsubscribe);
+                    }
                 },
             });
         },
