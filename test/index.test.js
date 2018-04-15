@@ -154,4 +154,9 @@ describe('riot-redux-connect', () => {
     tagInstance.trigger(reduxSyncEventName);
     expect(tagInstance.refs.derived1.innerHTML).toBe('bar');
   });
+
+  test('throws error when trying to connect already connected tag', () => {
+    resetTestSetup();
+    expect(() => { tagInstance.reduxConnect(null, null) }).toThrow();
+  });
 });
