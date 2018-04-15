@@ -148,15 +148,15 @@ of `riotReduxConnect`; it accepts following options:
   on each granular tag update by default (each `reduxConnect` call may
   override it on per-tag basis).
 
-  Main purpose of this function is to attach `Redux`-extracted data
-  (let's call it `stateOpts`) and `Redux`-dispatch-bound methods
-  (let's call them `dispathMethods`) to the tag instance.
+    Main purpose of this function is to attach `Redux`-extracted data
+    (let's call it `stateOpts`) and `Redux`-dispatch-bound methods
+    (let's call them `dispathMethods`) to the tag instance.
 
-  Function is called with tag context as `this`
-  and `stateOpts` and `dispathMethods` as arguments.
+    Function is called with tag context as `this`
+    and `stateOpts` and `dispathMethods` as arguments.
 
-  Default function implementation merges `stateOpts` with tag's `opts`
-  and assign `dispatchMethods` to be the direct methods of tag instance
+    Default function implementation merges `stateOpts` with tag's `opts`
+    and assign `dispatchMethods` to be the direct methods of tag instance
 
   * [`defaultImplicitDispatchOptName`] *(String)*: an opt name to use
   by default to put `Redux` `dispatch` method to,
@@ -167,27 +167,27 @@ of `riotReduxConnect`; it accepts following options:
   special event, which triggers re-calculation of redux-dervied opts and
   dispatch methods of the tag. Default to simple `redux-sync` value.
 
-  This is mostly needed when you have selectors that depend on tag opts,
-  and once those opts are updated you need to somehow
-  get an updated redux-derived props and dispatch methods. You can also
-  override this special event's name on the per-tag basis
-  (see option `reduxSyncEventName` further).
+    This is mostly needed when you have selectors that depend on tag opts,
+    and once those opts are updated you need to somehow
+    get an updated redux-derived props and dispatch methods. You can also
+    override this special event's name on the per-tag basis
+    (see option `reduxSyncEventName` further).
 
   * [`defaultDisablePreventUpdate`] *(Boolean)*: if `true` the default
   behavior of preventing `riot`'s' auto-updates in action creators
   will be disabled for all tags; (by default this option set to `false`)
 
-  I.e. `riot` [automatically updates tag](http://riotjs.com/guide/#tag-lifecycle)
-  after any DOM-event handler was invoked in the contents of this tag.
-  When you're using action creator as an event handler, you're getting
-  double update (one auto-update by `riot` and one auto-update by `riot-redux-connect`).
-  That's why `riot-redux-connect` tries to detect when action creator is used
-  as an event handler and to automatically set `e.preventUpdate = true` to
-  get rid of excessive `riot` auto-updates in those cases. You can disable
-  this behavior by setting `defaultDisablePreventUpdate` to `true`, if you
-  are not agree with `riotReduxConnect` for some reason. You can also override
-  update-preventing behaviour on per-action-creator basis
-  (see option `disablePreventUpdate` further).
+    I.e. `riot` [automatically updates tag](http://riotjs.com/guide/#tag-lifecycle)
+    after any DOM-event handler was invoked in the contents of this tag.
+    When you're using action creator as an event handler, you're getting
+    double update (one auto-update by `riot` and one auto-update by `riot-redux-connect`).
+    That's why `riot-redux-connect` tries to detect when action creator is used
+    as an event handler and to automatically set `e.preventUpdate = true` to
+    get rid of excessive `riot` auto-updates in those cases. You can disable
+    this behavior by setting `defaultDisablePreventUpdate` to `true`, if you
+    are not agree with `riotReduxConnect` for some reason. You can also override
+    update-preventing behaviour on per-action-creator basis
+    (see option `disablePreventUpdate` further).
 
   * [`memoizeByFirstArgReference`] *(Function)*: custom memoize
   implementation to use instead of the default one that uses `WeakMap`;
@@ -293,23 +293,23 @@ these additional options:
   * [`onStateChange`] *(Function)*: a function to be called
   on each granular tag update.
 
-  Main purpose of this function is to attach `Redux`-extracted data
-  (let's call it `stateOpts`) and `Redux`-dispatch-bound methods
-  (let's call them `dispathMethods`) to the tag instance.
+    Main purpose of this function is to attach `Redux`-extracted data
+    (let's call it `stateOpts`) and `Redux`-dispatch-bound methods
+    (let's call them `dispathMethods`) to the tag instance.
 
-  Function is called with tag context as `this`
-  and `stateOpts` and `dispathMethods` as arguments.
+    Function is called with tag context as `this`
+    and `stateOpts` and `dispathMethods` as arguments.
 
-  Defaults to the `defaultOnStateChange` value
-  of `riotReduxConnect`'s `options` argument.
+    Defaults to the `defaultOnStateChange` value
+    of `riotReduxConnect`'s `options` argument.
 
   * [`implicitDispatchOptName`] *(String)*: an opt name to use
   to put `Redux` `dispatch` method to,
   when no explicit `mapDispatchToMethods` argument is passed
   to `reduxConnect`.
 
-  Defaults to the `defaultImplicitDispatchOptName` value
-  of `riotReduxConnect`'s `options` argument.
+    Defaults to the `defaultImplicitDispatchOptName` value
+    of `riotReduxConnect`'s `options` argument.
 
   * [`reduxSyncEventName`] *(String)*: defines the name for the
   special event, which triggers re-calculation of redux-dervied opts and
@@ -317,16 +317,16 @@ these additional options:
   that depend on tag opts, and once those opts are updated you need to somehow
   get an updated redux-derived props and dispatch methods.
 
-  Defaults to the `defaultReduxSyncEventName` value
-  of `riotReduxConnect`'s `options` argument.
+    Defaults to the `defaultReduxSyncEventName` value
+    of `riotReduxConnect`'s `options` argument.
 
   * [`disablePreventUpdate`] *([String])*: array of names of the properties
   in `mapDispatchToMethods` object (for `mapDispatchToMethods` function this
   options does nothing), for which the default behavior of disabling riot's
   auto-update (on DOM event handler calls) should NOT work.
 
-  Defaults to the `defaultDisablePreventUpdate` value
-  of `riotReduxConnect`'s `options` argument.
+    Defaults to the `defaultDisablePreventUpdate` value
+    of `riotReduxConnect`'s `options` argument.
 
 
 
@@ -337,5 +337,3 @@ these additional options:
 ## License
 
 MIT
-
-
