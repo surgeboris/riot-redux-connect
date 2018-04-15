@@ -22,9 +22,14 @@ export function riotReduxConnect(riot, store, globalOptions = {}) {
             const unsubscribe = store.subscribe(updateTag);
             this.on('before-unmount', unsubscribe);
           }
-          this.on('redux-sync', updateTag);
+          onReduxSyncEvent(instanceConfig, updateTag);
         },
       });
     },
   });
+}
+
+function onReduxSyncEvent(instanceConfig, handler) {
+  const { reduxSyncEventName, tagInstance } = instanceConfig;
+  tagInstance.on(reduxSyncEventName, handler);
 }

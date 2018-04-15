@@ -167,6 +167,7 @@ describe('riot-redux-connect', () => {
 
 describe('riot-redux-connect', () => {
   let tagInstance;
+  const reduxSyncEventName = 'foobar';
   beforeAll(() => {
     resetStore();
     updateStore({ itemsToPick: ['foo', 'bar'] });
@@ -176,6 +177,7 @@ describe('riot-redux-connect', () => {
         this.reduxConnect(
           ({ itemsToPick }, tag) => ({ picked: itemsToPick[tag.opts.item] }),
           null,
+          { reduxSyncEventName }
         );
       },
       { item: 0 },
@@ -186,12 +188,12 @@ describe('riot-redux-connect', () => {
     resetStore();
   });
 
-  test('updates tag instance on "redux-sync" event', () => {
+  test('updates tag instance on customizable "redux-sync" event', () => {
     expect(tagInstance.refs.derived.innerHTML).toBe('foo');
     tagInstance.opts.item = 1;
     tagInstance.update();
     expect(tagInstance.refs.derived.innerHTML).toBe('foo');
-    tagInstance.trigger("redux-sync");
+    tagInstance.trigger(reduxSyncEventName);
     expect(tagInstance.refs.derived.innerHTML).toBe('bar');
   });
 });
