@@ -22,7 +22,7 @@ function mdtmWithObject(mdtm, dispatch) {
 }
 
 function mdtmWithFunction(mdtm, dispatch, tag) {
-    const result = mdtm.call(tag, dispatch);
+    const result = mdtm.call(null, dispatch, tag);
     throwIfNotObjectReturned('mapDispatchToMethods', result);
     return result;
 }

@@ -131,7 +131,7 @@ describe('riot-redux-connect', () => {
     resetStore();
   });
 
-  test('passes dispatch and tag instance as an arguments to the function passed as mapDispatchToMethods argument', () => {
+  test('passes dispatch and tag instance as an arguments to the function passed as "mapDispatchToMethods" argument', () => {
     const { mock: { calls } } = mapDispatchToMethods;
     expect(calls.length).toBe(1);
     expect(typeof calls[0][0]).toBe('function');
@@ -160,7 +160,7 @@ describe('riot-redux-connect', () => {
     resetStore();
   });
 
-  test('provides implicit dispatch under customized opt name when there is no mapDispatchToMethods argument', () => {
+  test('provides implicit customizable "dispatch" opt when there is no "mapDispatchToMethods" argument', () => {
     expect(typeof tagInstance.opts[implicitDispatchOptName]).toBe('function');
   });
 });

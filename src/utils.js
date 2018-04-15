@@ -10,15 +10,6 @@ export function memoize(fn) {
     };
 }
 
-export function throwIfNotObjectReturned(name, value) {
-    const valueType = typeof value;
-    if (valueType !== 'object') {
-        throw new Error(
-            `${name} should return object; ${valueType} returned instead!`
-        );
-    }
-}
-
 export function isShallowEqual(v, o) {
     for(let key in v) {
         if(!(key in o) || v[key] !== o[key])
@@ -31,25 +22,24 @@ export function isShallowEqual(v, o) {
     return true;
 }
 
-export function riotTagUpdate(
-    stateOpts,
-    dispatchMethods
-) {
-    this.update(Object.assign({}, dispatchMethods, {
-        dispatchMethods,
-        opts: Object.assign({}, this.opts, stateOpts),
-    }));
+export function throwIfNotObjectReturned(name, value) {
+  const valueType = typeof value;
+  if (valueType !== 'object') {
+    throw new Error(
+      `${name} should return object; ${valueType} returned instead!`
+    );
+  }
 }
 
 const initStatusPropertyName = '_isRiotReduxConnectInitialized';
-export function throwIfAlreadyInitialized(obj) {
-  const isInitialized = obj[initStatusPropertyName];
+export function throwIfAlreadyInitialized(instance, { mixinName }) {
+  const isInitialized = instance[initStatusPropertyName];
   if (isInitialized) {
     throw new Error(
-      `attempt to call "${mixinName}" mixin method twice!`
+      `attempt to call "${mixinName}" mixin twice!`
     );
   }
-  Object.defineProperty(obj, initStatusPropertyName, {
+  Object.defineProperty(instance, initStatusPropertyName, {
     configurable: false,
     enumerable: false,
     writable: false,
