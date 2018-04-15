@@ -4,7 +4,7 @@
   "description": "react-redux API implementation (adapted to Riot)",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "keywords": [
     "riot",
@@ -21,5 +21,13 @@
     "url": "https://github.com/surgeboris/riot-redux-connect"
   },
   "author": "Boris Sergeyev <surgeboris@gmail.com> (https://surgeboris.github.io)",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "babel-preset-env": "1.6.1",
+    "jest": "22.4.3",
+    "riot": "3.9.1"
+  },
+  "dependencies": {
+    "redux": "3.7.2"
+  }
 }
