@@ -77,8 +77,8 @@ riot.mount('some-tag'));
 ### some-tag.tag:
 
 ```html
-import someAction from './action-creators';
-import otherAction from './action-creators';
+import { someAction, otherAction } from './action-creators';
+import { selector, otherSelector } from './selectors';
 
 <some-tag>
   <pre>{opts.infoReceivedFromRedux}</pre>
@@ -87,11 +87,12 @@ import otherAction from './action-creators';
   <button type="button" onclick={otherAction}>OtherAction</button
   <script>
     function mapStateToOpts(state) {
-      const selector = state => state; // not real selector
-      const otherSelector = state => state; // not real selector
       /*
-       * you can select any info or derive some data from state;
-       * selector functions may be memoized for performance,
+       * selectors are functions that are receiving state plain object
+       * and returning plain object with the data derived from state;
+       *
+       * selectors may ease the pain of refactoring state shape;
+       * they can also improve perofrmance by leveraging memoization;
        * for further info see https://github.com/reactjs/reselect
        */
       return {
@@ -161,9 +162,34 @@ of `riotReduxConnect`; it accepts following options:
   when no explicit `mapDispatchToMethods` argument
   is passed to `reduxConnect`
 
+  * [`defaultReduxSyncEventName`] *(String)*: defines the name for the
+  special event, which triggers re-calculation of redux-dervied opts and
+  dispatch methods of the tag. Default to simple `redux-sync` value.
+
+  This is mostly needed when you have selectors that depend on tag opts,
+  and once those opts are updated you need to somehow
+  get an updated redux-derived props and dispatch methods. You can also
+  override this special event's name on the per-tag basis
+  (see option `reduxSyncEventName` further).
+
+  * [`defaultDisablePreventUpdate`] *(Boolean)*: if `true` the default
+  behavior of preventing `riot`'s' auto-updates in action creators
+  will be disabled for all tags; (by default this option set to `false`)
+
+  I.e. `riot` [automatically updates tag](http://riotjs.com/guide/#tag-lifecycle)
+  after any DOM-event handler was invoked in the contents of this tag.
+  When you're using action creator as an event handler, you're getting
+  double update (one auto-update by `riot` and one auto-update by `riot-redux-connect`).
+  That's why `riot-redux-connect` tries to detect when action creator is used
+  as an event handler and to automatically set `e.preventUpdate = true` to
+  get rid of excessive `riot` auto-updates in those cases. You can disable
+  this behavior by setting `defaultDisablePreventUpdate` to `true`, if you
+  are not agree with `riotReduxConnect` for some reason. You can also override
+  update-preventing behaviour on per-action-creator basis
+  (see option `disablePreventUpdate` further).
 
   * [`memoizeByFirstArgReference`] *(Function)*: custom memoize
-  implementation to use instead of default one that uses `WeakMap`;
+  implementation to use instead of the default one that uses `WeakMap`;
   `memoizeByFirstArgReference` should accept a function
   and return its counterpart memoized by using first argument reference
   as a key.
@@ -226,13 +252,19 @@ inside it is assumed to be a `Redux` action creator. An object
 with the same function names, but with every action creator
 wrapped into a `dispatch` call so they may be invoked directly,
 by default will be assigned to be the tag instance methods.
+`riotReduxConnect` is also checking if those action creators
+are used as DOM event handlers and in case they are,
+[riot auto-updates](http://riotjs.com/guide/#tag-lifecycle)
+is automatically disabled on them (unless you've
+set `defaultDisablePreventUpdate` to `true`, of course).
 
   If a function is passed, it will be given `dispatch` as the
   first parameter and `tagInstance` as a second parameter.
   It’s up to you to return an object that somehow uses `dispatch`
   to bind action creators in your own way. (Tip: you may use the
   [`bindActionCreators()`](https://redux.js.org/api-reference/bindactioncreators)
-  helper from `Redux`.)
+  helper from `Redux`). Note that riot auto updates does not disabled
+  in this case, so beware of double-updates on connected tag!
 
   `tagInstance` argument can be used to access tag's `opts` (or other
   properties/methods) in order to parametrize action creators somehow.
@@ -277,6 +309,24 @@ these additional options:
 
   Defaults to the `defaultImplicitDispatchOptName` value
   of `riotReduxConnect`'s `options` argument.
+
+  * [`reduxSyncEventName`] *(String)*: defines the name for the
+  special event, which triggers re-calculation of redux-dervied opts and
+  dispatch methods of the tag. This is mostly needed when you have selectors
+  that depend on tag opts, and once those opts are updated you need to somehow
+  get an updated redux-derived props and dispatch methods.
+
+  Defaults to the `defaultReduxSyncEventName` value
+  of `riotReduxConnect`'s `options` argument.
+
+  * [`disablePreventUpdate`] *([String])*: array of names of the properties
+  in `mapDispatchToMethods` object (for `mapDispatchToMethods` function this
+  options does nothing), for which the default behavior of disabling riot's
+  auto-update (on DOM event handler calls) should NOT work.
+
+  Defaults to the `defaultDisablePreventUpdate` value
+  of `riotReduxConnect`'s `options` argument.
+
 
 
 
