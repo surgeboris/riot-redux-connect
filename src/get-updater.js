@@ -34,12 +34,15 @@ function getStateOpts({ store, mapStateToOpts, tagInstance }) {
 }
 
 function getDispatchMethods({
-  store, applyMdtmMemoized, mapDispatchToMethods, tagInstance
+  store, applyMdtmMemoized, mapDispatchToMethods, tagInstance,
+  disablePreventUpdateFor, defaultDisablePreventUpdate,
 }) {
   if (!shouldMapDispatchToMethods(mapDispatchToMethods)) {
     return noDispatchMethods;
   }
-  return applyMdtmMemoized(mapDispatchToMethods, store.dispatch, tagInstance);
+  return applyMdtmMemoized(mapDispatchToMethods, store.dispatch, tagInstance, {
+    disablePreventUpdateFor, defaultDisablePreventUpdate
+  });
 }
 
 function assignImplicitDispatchIfNeeded(stateOpts, {

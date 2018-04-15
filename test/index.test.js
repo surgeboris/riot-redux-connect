@@ -20,6 +20,7 @@ describe('riot-redux-connect', () => {
         <div ref="derived1">{opts.derivedValue1}</div>
         <div ref="derived2">{opts.derivedValue2}</div>
         <button ref="change_btn" onclick={change} />
+        <button ref="reset_btn" onclick={reset} />
       `,
       function() {
         this.reduxConnect(
@@ -28,12 +29,10 @@ describe('riot-redux-connect', () => {
             derivedValue2: `${part1}x${part2}`,
           }),
           {
-            change(e) {
-              e.preventUpdate = true;
+            change() {
               return createUpdateStoreAction({ part1: 'foo2', part2: 'bar2' });
             },
-            reset(e) {
-              e.preventUpdate = true;
+            reset() {
               return createUpdateStoreAction(defaultState);
             }
           }
@@ -70,10 +69,62 @@ describe('riot-redux-connect', () => {
     expect(tagInstance.refs.derived2.innerHTML).toBe('changed1xchanged2');
   });
 
+  test('prevents riot-update in actions by default', () => {
+    const before = tagInstance.numberOfUpdates;
+    simulateClick(tagInstance.refs.reset_btn);
+    const after = tagInstance.numberOfUpdates;
+    const updatesPerformed = after - before;
+    expect(updatesPerformed).toBe(1);
+  });
+
   test('enables riot tags to employ basic redux workflow', () => {
     simulateClick(tagInstance.refs.change_btn);
     expect(tagInstance.refs.derived1.innerHTML).toBe('foo2+bar2');
     expect(tagInstance.refs.derived2.innerHTML).toBe('foo2xbar2');
+  });
+});
+
+describe('riot-redux-connect', () => {
+  let tagInstance;
+  beforeAll(() => {
+    resetStore();
+    const defaultState = { foo: 'bar1' };
+    updateStore(defaultState);
+    tagInstance = mountTestTag(
+      `
+          <div ref="derived">{opts.derivedValue}</div>
+          <button ref="change_btn" onclick={change} />
+          <button ref="reset_btn" onclick={reset} />
+        `,
+      function() {
+        this.reduxConnect(
+          ({ foo }) => ({ derivedValue: foo }),
+          {
+            change: () => createUpdateStoreAction({ foo: 'bar2' }),
+            reset: () => createUpdateStoreAction(defaultState),
+          },
+          { disablePreventUpdateFor: ['change'] }
+        );
+        this.countUpdates();
+      }
+    );
+  });
+  afterAll(() => {
+    tagInstance.unmount();
+    resetStore();
+  });
+
+  test('allows to granularly disable riot-update prevention in action-creator methods via an option', () => {
+    const before1 = tagInstance.numberOfUpdates;
+    simulateClick(tagInstance.refs.change_btn);
+    const after1 = tagInstance.numberOfUpdates;
+    const updatesPerformedOnChange = after1 - before1;
+    expect(updatesPerformedOnChange).toBe(2);
+    const before2 = tagInstance.numberOfUpdates;
+    simulateClick(tagInstance.refs.reset_btn);
+    const after2 = tagInstance.numberOfUpdates;
+    const updatesPerformedOnReset = after2 - before2;
+    expect(updatesPerformedOnReset).toBe(1);
   });
 });
 
@@ -88,7 +139,6 @@ describe('riot-redux-connect', () => {
           null,
           {
             reset(e) {
-              e.preventUpdate = true;
               return createUpdateStoreAction({ acted: true })
             }
           },

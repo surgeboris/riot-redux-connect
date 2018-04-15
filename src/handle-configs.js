@@ -9,6 +9,7 @@ export const getInstanceConfigFactory = (globalOptions = {}) => {
     defaultOnStateChange = updateWithStateToOptsAndMethodsToTagInstance,
     defaultImplicitDispatchOptName = 'dispatch',
     defaultReduxSyncEventName = 'redux-sync',
+    defaultDisablePreventUpdate = false,
     memoizeByFirstArgReference: memoize = memoizeDefault,
   } = globalOptions;
 
@@ -19,6 +20,7 @@ export const getInstanceConfigFactory = (globalOptions = {}) => {
       onStateChange: defaultOnStateChange,
       implicitDispatchOptName: defaultImplicitDispatchOptName,
       reduxSyncEventName: defaultReduxSyncEventName,
+      disablePreventUpdate: defaultDisablePreventUpdate,
     };
     const overridenOptions = {
       applyMdtmMemoized,
