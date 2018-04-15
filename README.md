@@ -6,6 +6,7 @@ for [Redux](https://github.com/reactjs/redux).
 
 [![npm version](https://img.shields.io/npm/v/riot-redux-connect.svg?style=flat-square)](https://www.npmjs.com/package/riot-redux-connect)
 [![npm downloads](https://img.shields.io/npm/dm/riot-redux-connect.svg?style=flat-square)](https://www.npmjs.com/package/riot-redux-connect)
+[![travis-ci build](https://travis-ci.org/surgeboris/riot-redux-connect.svg?branch=master)](https://travis-ci.org/surgeboris/riot-redux-connect)
 
 Moving from `React + Redux` to `RiotJS + Redux`, I've been unable to find
 a convenient way to use `Redux` store in `Riot` tags.
