@@ -57,10 +57,10 @@ describe('riot-redux-connect', () => {
   });
 
   test('avoids updating the tag when unrelated part of store changed', () => {
-    const before = tagInstance.numberOfUpdates;
-    updateStore({ unrelated: {} });
-    const after = tagInstance.numberOfUpdates;
-    expect(after).toEqual(before);
+    const numberOfUpdates = tagInstance.countUpdatesDuringCall(
+      updateStore, { unrelated: {} }
+    );
+    expect(numberOfUpdates).toBe(0);
   });
 
   test('updates derived values automatically on any (even extraneous) store change', () => {
@@ -70,11 +70,10 @@ describe('riot-redux-connect', () => {
   });
 
   test('prevents riot-update in actions by default', () => {
-    const before = tagInstance.numberOfUpdates;
-    simulateClick(tagInstance.refs.reset_btn);
-    const after = tagInstance.numberOfUpdates;
-    const updatesPerformed = after - before;
-    expect(updatesPerformed).toBe(1);
+    const numberOfUpdates = tagInstance.countUpdatesDuringCall(
+      simulateClick, tagInstance.refs.reset_btn
+    );
+    expect(numberOfUpdates).toBe(1);
   });
 
   test('enables riot tags to employ basic redux workflow', () => {
@@ -115,16 +114,14 @@ describe('riot-redux-connect', () => {
   });
 
   test('allows to granularly disable riot-update prevention in action-creator methods via an option', () => {
-    const before1 = tagInstance.numberOfUpdates;
-    simulateClick(tagInstance.refs.change_btn);
-    const after1 = tagInstance.numberOfUpdates;
-    const updatesPerformedOnChange = after1 - before1;
-    expect(updatesPerformedOnChange).toBe(2);
-    const before2 = tagInstance.numberOfUpdates;
-    simulateClick(tagInstance.refs.reset_btn);
-    const after2 = tagInstance.numberOfUpdates;
-    const updatesPerformedOnReset = after2 - before2;
-    expect(updatesPerformedOnReset).toBe(1);
+    const numberOfUpdatesOnChange = tagInstance.countUpdatesDuringCall(
+      simulateClick, tagInstance.refs.change_btn
+    );
+    expect(numberOfUpdatesOnChange).toBe(2);
+    const numberOfUpdatesOnReset = tagInstance.countUpdatesDuringCall(
+      simulateClick, tagInstance.refs.reset_btn
+    );
+    expect(numberOfUpdatesOnReset).toBe(1);
   });
 });
 
@@ -153,10 +150,10 @@ describe('riot-redux-connect', () => {
   });
 
   test('avoids auto-updating the tag on state change if mapStateToOpts not used', () => {
-    const before = tagInstance.numberOfUpdates;
-    simulateClick(tagInstance.refs.act_btn);
-    const after = tagInstance.numberOfUpdates;
-    expect(before).toEqual(after);
+    const numberOfUpdates = tagInstance.countUpdatesDuringCall(
+      simulateClick, tagInstance.refs.act_btn
+    );
+    expect(numberOfUpdates).toBe(0);
   });
 });
 

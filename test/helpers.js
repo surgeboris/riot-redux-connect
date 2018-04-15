@@ -18,6 +18,12 @@ export function addTestMixins(riot) {
         init() {
           this.numberOfUpdates = 0;
           this.on('updated', () => this.numberOfUpdates++);
+        },
+        countUpdatesDuringCall(fn, ...args) {
+          const before = this.numberOfUpdates;
+          fn(...args);
+          const after = this.numberOfUpdates;
+          return after - before;
         }
       });
     }
