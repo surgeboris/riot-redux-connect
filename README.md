@@ -25,6 +25,7 @@ of the Redux store will be updated, not the whole application.
 Although not all `react-redux` features are currently implemented,
 `riot-redux-connect` still covers most popular usecases.
 Missing `react-redux` features could be implemented in the future
+
 (if there will be demand on them).
 
 
@@ -142,7 +143,6 @@ of `riotReduxConnect`; it accepts following options:
 
   * [`mixinName`] *(String)*: a method name to use in global mixin
   instead of `reduxConnect`
-
 
   * [`defaultOnStateChange`] *(Function)*: a function to be called
   on each granular tag update by default (each `reduxConnect` call may
@@ -329,6 +329,62 @@ these additional options:
     of `riotReduxConnect`'s `options` argument.
 
 
+
+
+
+
+## Multiple stores example
+
+
+
+Using multiple store is discouraged by Redux methodology, so please use
+this way only if you're know what you're doing.
+
+
+### index.js:
+
+```javascript
+import riot from 'riot';
+import riotReduxConnect from 'riot-redux-connect';
+import store1 from './store1';
+import store2 from './store2';
+
+riotReduxConnect(riot, store1, {
+  mixinName: 'connectStore1'
+});
+
+riotReduxConnect(riot, store1, {
+  mixinName: 'connectStore2'
+});
+
+document.body.innerHTML = `<some-tag></some-tag>`;
+riot.mount('some-tag'));
+```
+
+### some-tag.tag:
+
+```html
+import { store1Action, store2Action } from './action-creators';
+import { store1Selector, store2Selector } from './selectors';
+
+<some-tag>
+  <pre>{opts.infoFromStore1}</pre>
+  <pre>{opts.infoFromStore2}</pre>
+  <button type="button" onclick={store1Action}>Store1 action</button>
+  <button type="button" onclick={store2Action}>Store2 action</button
+  <script>
+    this.connectStore1(
+      state => ({ infoFromStore1: store1Selector(state) }),
+      { store1Action }
+    );
+
+    this.connectStore2(
+      state => ({ infoFromStore2: store2Selector(state) }),
+      { store2Action }
+    );
+  </script>
+</some-tag>
+```
 
 
 
