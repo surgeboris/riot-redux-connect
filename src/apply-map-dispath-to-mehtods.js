@@ -14,11 +14,16 @@ function applyMdtm(mdtm, dispatch, tag, options) {
 }
 
 function preventUpdateIfNeeded([e, ...rest], key, options) {
-  if (rest.length !== 0) return;
-  if (typeof e !== 'object') return;
-  if (typeof e.preventDefault !== 'function') return;
-  const { disablePreventUpdateFor = [], defaultDisablePreventUpdate } = options;
+  const { defaultDisablePreventUpdate } = options;
   if (defaultDisablePreventUpdate) return;
+
+  const isMultipleArgsPassed = rest.length !== 0;
+  if (isMultipleArgsPassed) return;
+  const isDomEvent = typeof e === 'object'
+      || typeof e.preventDefault == 'function';
+  if (!isDomEvent) return;
+
+  const { disablePreventUpdateFor = [] } = options;
   if (disablePreventUpdateFor.indexOf(key) !== -1) return;
   e.preventUpdate = true;
 }

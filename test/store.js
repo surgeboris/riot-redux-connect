@@ -13,6 +13,11 @@ export const store = createStore((state = {}, action) => {
   return state;
 });
 
+const identityFn = _ => _;
+export function getServerSideStore(preloadedState) {
+  return  createStore(identityFn, preloadedState);
+}
+
 export function createUpdateStoreAction(update) {
   return { type: UPDATE_STATE_ACTION, update };
 }

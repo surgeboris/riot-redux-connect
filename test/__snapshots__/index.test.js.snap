@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`riot-redux-connect supports server-side rendering 1`] = `
+"<ssr-test>
+  <div ref=\\"derived1\\">ssr1+ssr2</div>
+  <div ref=\\"derived2\\">ssr1xssr2</div>
+  <button ref=\\"change_btn\\">
+  </button><button ref=\\"reset_btn\\">
+</button></ssr-test>"
+`;

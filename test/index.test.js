@@ -1,54 +1,54 @@
 import * as riot from 'riot';
-import riotReduxConnect from '../index.js';
-import { addTestMixins, mountTestTag, simulateClick } from './helpers.js';
+import {
+  addTestMixins,
+  performReduxConnect,
+  buildTestTag,
+  mountTestTag,
+  simulateClick,
+} from './helpers.js';
 import {
   store, createUpdateStoreAction,
-  updateStore, resetStore
+  updateStore, resetStore,
+  getServerSideStore
 } from './store.js';
 
-addTestMixins(riot);
-riotReduxConnect(riot, store);
-
 const defaultState = { part1: 'foo1', part2: 'bar1' };
-
-function getTagInstance({
-  tagHtml = `
-    <div ref="derived1">{opts.derivedValue1}</div>
-    <div ref="derived2">{opts.derivedValue2}</div>
-    <button ref="change_btn" onclick={change} />
-    <button ref="reset_btn" onclick={reset} />
-  `,
-  mapStateToOptions = ({ part1, part2 }) => ({
-    derivedValue1: `${part1}+${part2}`,
-    derivedValue2: `${part1}x${part2}`,
-  }),
-  mapDispatchToMethods = {
+const defaultTagHtml = `
+  <div ref="derived1">{opts.derivedValue1}</div>
+  <div ref="derived2">{opts.derivedValue2}</div>
+  <button ref="change_btn" onclick={change} />
+  <button ref="reset_btn" onclick={reset} />
+`;
+const defaultTagScriptOpts = {
+  mapStateToOpts({ part1, part2 }) {
+    return {
+      derivedValue1: `${part1}+${part2}`,
+      derivedValue2: `${part1}x${part2}`,
+    };
+  },
+  mapDispatchToMethods: {
     change: () => createUpdateStoreAction({ part1: 'foo2', part2: 'bar2' }),
     reset: () => createUpdateStoreAction(defaultState),
   },
-  connectConfig = {},
-  tagOpts,
-} = {}) {
-  function tagScript() {
-    this.reduxConnect(
-      mapStateToOptions,
-      mapDispatchToMethods,
-      connectConfig
-    );
-    this.countUpdates();
-  };
-  return mountTestTag(tagHtml, tagScript, tagOpts);
-}
+  connectConfig: {},
+};
 
 describe('riot-redux-connect', () => {
   let tagInstance;
 
   function resetTestSetup(
-    newTagInstanceConfig = {},
-    newState = defaultState,
+    {
+      initialState = defaultState,
+      reduxConnectOpts = {},
+      tagHtml = defaultTagHtml, tagScriptOpts, tagOpts = {},
+    } = {},
   ) {
-    updateStore(newState);
-    tagInstance = getTagInstance(newTagInstanceConfig);
+    const mixinName = performReduxConnect(store, reduxConnectOpts);
+    updateStore(initialState);
+    const tagScriptOptsFull = Object.assign(
+      { mixinName }, defaultTagScriptOpts, tagScriptOpts
+    );
+    tagInstance = mountTestTag(tagHtml, tagScriptOptsFull, tagOpts);
   };
 
   afterEach(() => {
@@ -98,8 +98,11 @@ describe('riot-redux-connect', () => {
 
   test('allows to granularly disable riot-update prevention in action-creator methods via an option', () => {
     resetTestSetup({
-      connectConfig: { disablePreventUpdateFor: ['change'] },
+      tagScriptOpts: {
+        connectConfig: { disablePreventUpdateFor: ['change'] },
+      },
     });
+    const e = {};
     const numberOfUpdatesOnChange = tagInstance.countUpdatesDuringCall(
       simulateClick, tagInstance.refs.change_btn
     );
@@ -112,7 +115,9 @@ describe('riot-redux-connect', () => {
 
   test('avoids auto-updating the tag on state change if mapStateToOpts not used', () => {
     resetTestSetup({
-      mapStateToOptions: null
+      tagScriptOpts: {
+        mapStateToOpts: null,
+      },
     });
     const numberOfUpdates = tagInstance.countUpdatesDuringCall(
       simulateClick, tagInstance.refs.change_btn
@@ -122,7 +127,7 @@ describe('riot-redux-connect', () => {
 
   test('passes dispatch and tag instance as an arguments to the function passed as "mapDispatchToMethods" argument', () => {
     const mapDispatchToMethods = jest.fn().mockReturnValue({});
-    resetTestSetup({ mapDispatchToMethods });
+    resetTestSetup({ tagScriptOpts: { mapDispatchToMethods } });
     const { mock: { calls } } = mapDispatchToMethods;
     expect(calls.length).toBe(1);
     expect(typeof calls[0][0]).toBe('function');
@@ -132,8 +137,10 @@ describe('riot-redux-connect', () => {
   test('provides implicit customizable "dispatch" opt when there is no "mapDispatchToMethods" argument', () => {
     const implicitDispatchOptName = 'foobar';
     resetTestSetup({
-      mapDispatchToMethods: null,
-      connectConfig: { implicitDispatchOptName }
+      tagScriptOpts: {
+        mapDispatchToMethods: null,
+        connectConfig: { implicitDispatchOptName }
+      }
     });
     expect(typeof tagInstance.opts[implicitDispatchOptName]).toBe('function');
   });
@@ -141,12 +148,15 @@ describe('riot-redux-connect', () => {
   test('updates tag instance on customizable "redux-sync" event', () => {
     const reduxSyncEventName = 'foobar';
     resetTestSetup({
-      mapStateToOptions({ itemsToPick }, tag) {
-        return { derivedValue1: itemsToPick[tag.opts.item] };
+      initialState: { itemsToPick: ['foo', 'bar'] },
+      tagScriptOpts: {
+        mapStateToOpts({ itemsToPick }, tag) {
+          return { derivedValue1: itemsToPick[tag.opts.item] };
+        },
+        connectConfig: { reduxSyncEventName },
       },
-      connectConfig: { reduxSyncEventName },
       tagOpts: { item: 0 },
-    }, { itemsToPick: ['foo', 'bar'] });
+    });
     expect(tagInstance.refs.derived1.innerHTML).toBe('foo');
     tagInstance.opts.item = 1;
     tagInstance.update();
@@ -160,3 +170,20 @@ describe('riot-redux-connect', () => {
     expect(() => { tagInstance.reduxConnect(null, null) }).toThrow();
   });
 });
+
+describe('riot-redux-connect', () => {
+  test('supports server-side rendering', () => {
+    const mixinName = 'ssrReduxConnect';
+    const ssrStore = getServerSideStore({ part1: 'ssr1', part2: 'ssr2' });
+    performReduxConnect(ssrStore, { mixinName });
+    const tagScriptOpts = Object.assign({ mixinName }, defaultTagScriptOpts);
+    const tagName = buildTestTag(
+      defaultTagHtml,
+      tagScriptOpts,
+      { tagName: 'ssr-test' }
+    );
+    const output = riot.render(tagName);
+    expect(output).toMatchSnapshot();
+  });
+});
+
