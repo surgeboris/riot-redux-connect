@@ -25,7 +25,6 @@ of the Redux store will be updated, not the whole application.
 Although not all `react-redux` features are currently implemented,
 `riot-redux-connect` still covers most popular usecases.
 Missing `react-redux` features could be implemented in the future
-
 (if there will be demand on them).
 
 
