@@ -40,7 +40,6 @@ function updateWithStateToOptsAndMethodsToTagInstance(
   dispatchMethods
 ) {
   this.update(Object.assign({}, dispatchMethods, {
-    dispatchMethods,
     opts: Object.assign({}, this.opts, stateOpts),
   }));
 }
