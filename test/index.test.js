@@ -68,6 +68,19 @@ describe('riot-redux-connect', () => {
     expect(typeof tagInstance.reset).toBe('function');
   });
 
+  test("wraps thunk action-creator in a way that keeps thunk's return value", () => {
+    const returnValue = Symbol('thunk return value');
+    const thunk = dispatch => returnValue;
+    resetTestSetup({
+      tagScriptOpts: {
+        mapDispatchToMethods: {
+          checkReturnValue: params => thunk,
+        },
+      },
+    });
+    expect(tagInstance.checkReturnValue()).toBe(returnValue);
+  });
+
   test('avoids updating the tag when unrelated part of store changed', () => {
     resetTestSetup();
     const numberOfUpdates = tagInstance.countUpdatesDuringCall(

@@ -20,7 +20,7 @@ function preventUpdateIfNeeded([e, ...rest], key, options) {
   const isMultipleArgsPassed = rest.length !== 0;
   if (isMultipleArgsPassed) return;
   const isDomEvent = typeof e === 'object'
-      || typeof e.preventDefault == 'function';
+      && typeof e.preventDefault == 'function';
   if (!isDomEvent) return;
 
   const { disablePreventUpdateFor = [] } = options;
@@ -33,7 +33,7 @@ function mdtmWithObject(mdtm, dispatch, options) {
         const actionCreator = mdtm[key];
         result[key] = (...args) => {
           preventUpdateIfNeeded(args, key, options);
-          dispatch(actionCreator(...args));
+          return dispatch(actionCreator(...args));
         };
         return result;
     }, {});

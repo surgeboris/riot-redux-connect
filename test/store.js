@@ -1,9 +1,10 @@
-import { createStore } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
+import reduxThunk from 'redux-thunk';
 
 const UPDATE_STATE_ACTION = 'TEST/UPDATE_STATE';
 const RESET_STATE_ACTION = 'TEST/RESET_STATE';
 
-export const store = createStore((state = {}, action) => {
+function rootReducer(state = {}, action) {
   if (action.type === UPDATE_STATE_ACTION) {
     return Object.assign({}, state, action.update);
   }
@@ -11,7 +12,9 @@ export const store = createStore((state = {}, action) => {
     return {};
   }
   return state;
-});
+}
+
+export const store = createStore(rootReducer, applyMiddleware(reduxThunk));
 
 const identityFn = _ => _;
 export function getServerSideStore(preloadedState) {
