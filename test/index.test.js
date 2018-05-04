@@ -40,15 +40,18 @@ describe('riot-redux-connect', () => {
     {
       initialState = defaultState,
       reduxConnectOpts = {},
-      tagHtml = defaultTagHtml, tagScriptOpts, tagOpts = {},
+      tagHtml = defaultTagHtml, getTagScriptFn, tagScriptOpts, tagOpts = {},
     } = {},
   ) {
     const mixinName = performReduxConnect(store, reduxConnectOpts);
     updateStore(initialState);
-    const tagScriptOptsFull = Object.assign(
+    let tagScriptArg = Object.assign(
       { mixinName }, defaultTagScriptOpts, tagScriptOpts
     );
-    tagInstance = mountTestTag(tagHtml, tagScriptOptsFull, tagOpts);
+    if (typeof getTagScriptFn === 'function') {
+      tagScriptArg = getTagScriptFn(mixinName);
+    }
+    tagInstance = mountTestTag(tagHtml, tagScriptArg, tagOpts);
   };
 
   afterEach(() => {
