@@ -39,7 +39,12 @@ function updateWithStateToOptsAndMethodsToTagInstance(
   stateOpts,
   dispatchMethods
 ) {
-  this.update(Object.assign({}, dispatchMethods, {
+  const updateObj = Object.assign({}, dispatchMethods, {
     opts: Object.assign({}, this.opts, stateOpts),
-  }));
+  });
+  if (this.isMounted) {
+    this.update(updateObj);
+  } else {
+    Object.assign(this, updateObj);
+  }
 }

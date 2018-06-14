@@ -5,6 +5,7 @@ import {
   buildTestTag,
   mountTestTag,
   simulateClick,
+  getTemplateErrorChecker,
 } from './helpers.js';
 import {
   store, createUpdateStoreAction,
@@ -40,7 +41,10 @@ describe('riot-redux-connect', () => {
     {
       initialState = defaultState,
       reduxConnectOpts = {},
-      tagHtml = defaultTagHtml, getTagScriptFn, tagScriptOpts, tagOpts = {},
+      tagHtml = defaultTagHtml,
+      tagCss = '',
+      rootAttributes = '',
+      getTagScriptFn, tagScriptOpts, tagOpts = {},
     } = {},
   ) {
     const mixinName = performReduxConnect(store, reduxConnectOpts);
@@ -51,7 +55,9 @@ describe('riot-redux-connect', () => {
     if (typeof getTagScriptFn === 'function') {
       tagScriptArg = getTagScriptFn(mixinName);
     }
-    tagInstance = mountTestTag(tagHtml, tagScriptArg, tagOpts);
+    tagInstance = mountTestTag(
+      tagHtml, tagCss, rootAttributes, tagScriptArg, tagOpts
+    );
   };
 
   afterEach(() => {
@@ -184,6 +190,20 @@ describe('riot-redux-connect', () => {
   test('throws error when trying to connect already connected tag', () => {
     resetTestSetup();
     expect(() => { tagInstance.reduxConnect(null, null) }).toThrow();
+  });
+
+  test.only('avoids updating root attributes of not-mounted-yet component', () => {
+    let testValue = 'test string value';
+    getTemplateErrorChecker(() => {
+      resetTestSetup({
+        rootAttributes: 'data-test-attr="{methodDefinedAfter()}"',
+        tagScriptOpts: {
+          afterReduxConnect() {
+            this.methodDefinedAfter = () => testValue;
+          },
+        },
+      });
+    })();
   });
 });
 

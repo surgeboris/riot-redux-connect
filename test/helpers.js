@@ -10,18 +10,18 @@ export function performReduxConnect(store, globalOptions = {}) {
 }
 
 let nextTagNumber = 1;
-export function buildTestTag(tagHtml, tagScriptArg, opts = {}) {
+export function buildTestTag(tagHtml, tagCss, rootAttributes, tagScriptArg, opts = {}) {
   let tagScript = tagScriptArg;
   if (typeof tagScriptArg === 'object') {
     tagScript = getTagScript(tagScriptArg);
   }
   const tagName = opts.tagName || `test-tag${++nextTagNumber}`;
-  riot.tag(tagName, tagHtml, '', '', tagScript);
+  riot.tag(tagName, tagHtml, tagCss, rootAttributes, tagScript);
   return tagName;
 }
 
-export function mountTestTag(tagHtml, tagScriptArg, opts) {
-  const tagName = buildTestTag(tagHtml, tagScriptArg);
+export function mountTestTag(tagHtml, tagCss, rootAttributes, tagScriptArg, opts) {
+  const tagName = buildTestTag(tagHtml, tagCss, rootAttributes, tagScriptArg);
   const el = document.createElement('div');
   document.body.append(el);
   return riot.mount(el, tagName, opts)[0];
@@ -31,6 +31,17 @@ export function simulateClick(el) {
   var event = document.createEvent('HTMLEvents');
   event.initEvent('click', false, true);
   el.dispatchEvent(event);
+}
+
+export function getTemplateErrorChecker(fn) {
+  return function(...args) {
+    const origConsoleError = window.console.error;
+    const mock = jest.fn();
+    console.error = mock;
+    fn.apply(this, args);
+    expect(mock).not.toBeCalled();
+    console.error = origConsoleError;
+  };
 }
 
 riot.mixin({
@@ -50,15 +61,16 @@ const identityFn = _ => _;
 function getTagScript({
   mixinName,
   mapStateToOpts, mapDispatchToMethods, connectConfig,
-  onReduxConnect = identityFn,
+  beforeReduxConnect = identityFn, afterReduxConnect = identityFn,
 }) {
   return function() {
+    beforeReduxConnect.call(this);
     this[mixinName](
       mapStateToOpts,
       getMdtmNotUsedInMemoize(mapDispatchToMethods),
       connectConfig
     );
-    onReduxConnect.call(this);
+    afterReduxConnect.call(this);
   };
 };
 
