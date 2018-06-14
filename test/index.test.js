@@ -192,7 +192,7 @@ describe('riot-redux-connect', () => {
     expect(() => { tagInstance.reduxConnect(null, null) }).toThrow();
   });
 
-  test.only('avoids updating root attributes of not-mounted-yet component', () => {
+  test('avoids updating root attributes of not-mounted-yet component', () => {
     let testValue = 'test string value';
     getTemplateErrorChecker(() => {
       resetTestSetup({
@@ -215,6 +215,8 @@ describe('riot-redux-connect', () => {
     const tagScriptOpts = Object.assign({ mixinName }, defaultTagScriptOpts);
     const tagName = buildTestTag(
       defaultTagHtml,
+      '',
+      '',
       tagScriptOpts,
       { tagName: 'ssr-test' }
     );
