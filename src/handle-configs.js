@@ -2,7 +2,7 @@ import {
   memoize as memoizeDefault,
 } from './utils.js';
 
-import applyMdtm from './apply-map-dispath-to-mehtods.js';
+import applyMdtm from './apply-map-dispatch-to-methods.js';
 
 export const getInstanceConfigFactory = (globalOptions = {}) => {
   const {
